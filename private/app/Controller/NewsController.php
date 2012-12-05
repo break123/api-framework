@@ -23,12 +23,12 @@ class NewsController extends AbstractController
     public function get($request)
     {
         $articles = $this->readArticles();
-        switch (count($request->url_elements)) {
+        switch (count($request->segments)) {
             case 1:
                 return $articles;
             break;
             case 2:
-                $article_id = $request->url_elements[1];
+                $article_id = $request->segments[1];
                 return $articles[$article_id];
             break;
         }
@@ -42,9 +42,8 @@ class NewsController extends AbstractController
      */
     public function post($request)
     {
-        switch (count($request->url_elements)) {
+        switch (count($request->segments)) {
             case 1:
-                // validation should go here
                 $id = (count($articles) + 1);
                 $articles = $this->readArticles();
                 $article = array(
@@ -55,9 +54,8 @@ class NewsController extends AbstractController
                 );
                 $articles[] = $article;
                 $this->writeArticles($articles);
-                header('HTTP/1.1 201 Created');
-                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/news/'.$id);
-                return null;
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/news/' . $id, null, 201);
+                exit;
             break;
         }
     }
@@ -69,14 +67,15 @@ class NewsController extends AbstractController
      */
     protected function readArticles()
     {
-        $articles = json_decode(file_get_contents($this->articles_file));
+        $articles = unserialize(file_get_contents($this->articles_file));
         if (empty($articles)) {
+            $now = new DateTime();
             $articles = array(
                 1 => array(
                     'id' => 1,
-                    'title' => 'Test Article',
-                    'content' => 'Welcome to your new API framework!',
-                    'published' => date('c', mktime(18, 35, 48, 1, 13, 2012))
+                    'title' => 'Welcome to your new API framework!',
+                    'content' => 'To get started with your new API framework, check out the README on the GitHub repository.',
+                    'published' => $now->format('c')
                 )
             );
             $this->writeArticles($articles);
@@ -92,6 +91,6 @@ class NewsController extends AbstractController
      */
     protected function writeArticles($articles)
     {
-        return file_put_contents($this->articles_file, json_encode($articles));
+        return file_put_contents($this->articles_file, serialize($articles));
     }
 }
