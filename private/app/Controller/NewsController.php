@@ -8,11 +8,11 @@
 class NewsController extends AbstractController
 {
     /**
-     * News file.
+     * News file path.
      *
      * @var variable type
      */
-    protected $articles_file = './data/news.txt';
+    protected $articles_file = '../private/data/news.txt';
     
     /**
      * GET method.
@@ -56,7 +56,7 @@ class NewsController extends AbstractController
                 $articles[] = $article;
                 $this->writeArticles($articles);
                 header('HTTP/1.1 201 Created');
-                header('Location: /news/'.$id);
+                header('Location: http://' . $_SERVER['HTTP_HOST'] . '/news/'.$id);
                 return null;
             break;
         }
@@ -69,7 +69,7 @@ class NewsController extends AbstractController
      */
     protected function readArticles()
     {
-        $articles = unserialize(file_get_contents($this->articles_file));
+        $articles = json_decode(file_get_contents($this->articles_file));
         if (empty($articles)) {
             $articles = array(
                 1 => array(
@@ -92,7 +92,6 @@ class NewsController extends AbstractController
      */
     protected function writeArticles($articles)
     {
-        file_put_contents($this->articles_file, serialize($articles));
-        return true;
+        return file_put_contents($this->articles_file, json_encode($articles));
     }
 }

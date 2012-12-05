@@ -6,6 +6,8 @@
  * @author  Martin Bean <martin@martinbean.co.uk>
  */
 
+define('APP_PATH', dirname(__FILE__) . '/app/');
+
 /**
  * Generic class autoloader.
  * 
@@ -13,9 +15,9 @@
  */
 function autoload_class($class_name) {
     $directories = array(
-        'classes/',
-        'classes/controllers/',
-        'classes/models/'
+        APP_PATH . '/Controller/',
+        APP_PATH . '/Framework/',
+        APP_PATH . '/Model/'
     );
     foreach ($directories as $directory) {
         $filename = $directory . $class_name . '.php';
